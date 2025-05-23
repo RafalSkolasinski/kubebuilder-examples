@@ -5,6 +5,10 @@ This is my playground with [Kubebuilder](https://github.com/kubernetes-sigs/kube
 - Executed step by step to illustrate what each step brings in.
 - Updates will highlight differences between versions of Kubebuilder.
 
+## References
+- About Operator Pattern: https://kubernetes.io/docs/concepts/extend-kubernetes/operator/
+- About Controllers: https://kubernetes.io/docs/concepts/architecture/controller/
+
 
 ## Quick Start
 
@@ -74,3 +78,77 @@ Launch configuration:
 For example: the `pods` *resource* corresponds to the *Pod* `Kind`.
 
 Notice that resources are always lowercase, and by convention are the lowercase form of the Kind.
+
+
+## Getting Started
+
+- Reference: https://book.kubebuilder.io/getting-started
+- Source Code: [1-getting-started](1-getting-started/)
+- See also [operator-sdk tutorial](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/) which adds finalizer
+
+### Initial Scaffolding
+
+```bash
+# Bootstrap Project
+kubebuilder init --domain my.domain --repo my.domain/memcached --project-name memcached
+
+# Create API
+kubebuilder create api --group cache --version v1alpha1 --kind Memcached
+```
+
+### Implementing API
+
+After creating AP need to generate manifests with the specs and validations.
+
+To generate all required files:
+
+- Run `make generate` to create the `DeepCopy` implementations in `api/v1alpha1/zz_generated.deepcopy.go`.
+- Then, run `make manifests` to generate the CRD manifests under `config/crd/bases` and a sample for it under `config/crd/samples`.
+
+Both commands use [controller-gen](https://book.kubebuilder.io/reference/controller-gen) with different flags for code and manifest generation, respectively.
+
+### Reconciliation Process
+
+Here’s a pseudo-code example to illustrate reconciliation loop:
+```go
+reconcile App {
+  // Check if a Deployment for the app exists, if not, create one
+  // If there's an error, then restart from the beginning of the reconcile
+  if err != nil {
+    return reconcile.Result{}, err
+  }
+
+  // Check if a Service for the app exists, if not, create one
+  // If there's an error, then restart from the beginning of the reconcile
+  if err != nil {
+    return reconcile.Result{}, err
+  }
+
+  // Look for Database CR/CRD an check the Database Deployment's replicas size
+  // If deployment.replicas size doesn't match cr.size, then update it
+  // Then, restart from the beginning of the reconcile. For example, by returning `reconcile.Result{Requeue: true}, nil`.
+  if err != nil {
+    return reconcile.Result{Requeue: true}, nil
+  }
+  ...
+
+  // If at the end of the loop:
+  // Everything was executed successfully, and the reconcile can stop
+  return reconcile.Result{}, nil
+}
+```
+
+The following are a few possible return options to restart the Reconcile:
+```go
+// With the error:
+return ctrl.Result{}, err
+
+// Without an error:
+return ctrl.Result{Requeue: true}, nil
+
+// Therefore, to stop the Reconcile, use:
+return ctrl.Result{}, nil
+
+//Reconcile again after X time:
+return ctrl.Result{RequeueAfter: nextRun.Sub(r.Now())}, nil
+```
