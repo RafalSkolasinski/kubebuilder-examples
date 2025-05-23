@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -50,6 +51,7 @@ func (r *GuestbookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	_ = logf.FromContext(ctx)
 
 	// TODO(user): your logic here
+	fmt.Println("Running reconciler logic")
 
 	return ctrl.Result{}, nil
 }
