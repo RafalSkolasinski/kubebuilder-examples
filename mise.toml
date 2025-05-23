@@ -1,0 +1,4 @@
+[tools]
+kubebuilder = "4.3.1"
+kubectl = "1.33.1"
+minikube = "1.36.0"
