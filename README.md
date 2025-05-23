@@ -1,6 +1,6 @@
 # Kubebuilder Examples
 
-This is my playground with [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder) examples from https://book.kubebuilder.io/.
+This is my playground with [Kubebuilder](https://github.com/kubernetes-sigs/kubebuilder) examples from https://book.kubebuilder.io.
 
 - Executed step by step to illustrate what each step brings in.
 - Updates will highlight differences between versions of Kubebuilder.
