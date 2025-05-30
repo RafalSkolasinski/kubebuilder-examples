@@ -44,9 +44,9 @@ function generate_quick_start {
     print "Using kubebuilder: $(kubebuilder_version)"
 
     print "removing project ..."
-    rm -rf "${REPO_ROOT}/0-quick-start"
-    mkdir "${REPO_ROOT}/0-quick-start"
-    cd "${REPO_ROOT}/0-quick-start"
+    rm -rf "${REPO_ROOT}/0-quick-start/project"
+    mkdir -p "${REPO_ROOT}/0-quick-start/project"
+    cd "${REPO_ROOT}/0-quick-start/project"
 
     print "Running kubebuilder init ..."
     kubebuilder init --domain example.com --repo example.com/guestbook --project-name guestbook
@@ -76,9 +76,9 @@ function generate_getting_started {
     print "Using kubebuilder: $(kubebuilder_version)"
 
     print "removing project ..."
-    rm -rf "${REPO_ROOT}/1-getting-started"
-    mkdir "${REPO_ROOT}/1-getting-started"
-    cd "${REPO_ROOT}/1-getting-started"
+    rm -rf "${REPO_ROOT}/1-getting-started/project"
+    mkdir -p "${REPO_ROOT}/1-getting-started/project"
+    cd "${REPO_ROOT}/1-getting-started/project"
 
     print "Running kubebuilder init ..."
     kubebuilder init --domain example.com --repo example.com/memcached --project-name memcached
