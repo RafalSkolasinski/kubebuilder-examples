@@ -1,135 +1,125 @@
-# memcached
-// TODO(user): Add simple overview of use/purpose
+# Getting Started - Memcached Example
 
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+Reference: https://book.kubebuilder.io/getting-started
 
-## Getting Started
+A little more involved example that creates Memcached deployments.
+See also [operator-sdk tutorial](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/) which adds a finalizer to a similar controller.
 
-### Prerequisites
-- go version v1.23.0+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
+## Getting up & running
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+### Initial Scaffolding
 
-```sh
-make docker-build docker-push IMG=<some-registry>/memcached:tag
+```bash
+# Bootstrap Project
+kubebuilder init --domain example.com --repo example.com/memcached --project-name memcached
+
+# Create API
+kubebuilder create api --group cache --version v1alpha1 --kind Memcached
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified.
-And it is required to have access to pull the image from the working environment.
-Make sure you have the proper permission to the registry if the above commands don’t work.
+### Implementing API
 
-**Install the CRDs into the cluster:**
+After creating AP need to generate manifests with the specs and validations.
 
-```sh
+To generate all required files:
+
+- Run `make generate` to create the `DeepCopy` implementations in `api/v1alpha1/zz_generated.deepcopy.go`.
+- Then, run `make manifests` to generate the CRD manifests under `config/crd/bases` and a sample under `config/crd/samples`.
+
+Both commands use [controller-gen](https://book.kubebuilder.io/reference/controller-gen) with different flags for code and manifest generation, respectively.
+
+API and controller implementation is taken directly from upstream example, see [generate-example.sh](./generate-example.sh) script for details.
+
+### Running in cluster
+
+```bash
+# Install CRDs into the cluster
 make install
-```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+# Run your controller in the terminal
+make run
 
-```sh
-make deploy IMG=<some-registry>/memcached:tag
-```
-
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
-
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
-
-```sh
+# Deploy sample application
 kubectl apply -k config/samples/
+
+# Building images and deploying
+make docker-build docker-push IMG=rafalskolasinski/kubebuilder-memcached-operator:latest
+make deploy IMG=rafalskolasinski/kubebuilder-memcached-operator:latest
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+## Project Structure
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
+Project files:
 
-```sh
-kubectl delete -k config/samples/
+- `go.mod` → A new Go module matching our project, with basic dependencies
+- `Makefile` → Make targets for building and deploying your controller
+- `PROJECT` → Kubebuilder metadata for scaffolding new components
+- `cmd/main.go` → main project entrypoint
+
+Where development happens:
+
+- `api/v1/memcached_types.go` → API is definitions
+- `internal/controller/memcached_controller.go` → reconciliation business logic
+
+Launch configuration:
+
+- `config/default` → Kustomize YAML definitions (CRD, RBAC, controller runtime, etc.)
+
+### **Groups, Versions, Kinds**
+
+- `API Group`: An API Group in Kubernetes is simply a collection of related functionality.
+- `API Version`: Each group has one or more versions, which allow us to change how an API works over time.
+- `Kinds`: Each API group-version contains one or more API types, which we call Kinds.
+- `Resource`: You’ll also hear mention of resources on occasion. A resource is simply a use of a Kind in the API.
+- `GroupKindVersion`: This is a kind in a particular group-version (GVK). Each GVK is given root Go type in package.
+
+For example: the `pods` *resource* corresponds to the *Pod* `Kind`.
+
+Notice that resources are always lowercase, and by convention are the lowercase form of the Kind.
+
+
+## Reconciliation Process
+
+Here’s a pseudo-code example to illustrate reconciliation loop:
+```go
+reconcile App {
+  // Check if a Deployment for the app exists, if not, create one
+  // If there's an error, then restart from the beginning of the reconcile
+  if err != nil {
+    return reconcile.Result{}, err
+  }
+
+  // Check if a Service for the app exists, if not, create one
+  // If there's an error, then restart from the beginning of the reconcile
+  if err != nil {
+    return reconcile.Result{}, err
+  }
+
+  // Look for Database CR/CRD an check the Database Deployment's replicas size
+  // If deployment.replicas size doesn't match cr.size, then update it
+  // Then, restart from the beginning of the reconcile. For example, by returning `reconcile.Result{Requeue: true}, nil`.
+  if err != nil {
+    return reconcile.Result{Requeue: true}, nil
+  }
+  ...
+
+  // If at the end of the loop:
+  // Everything was executed successfully, and the reconcile can stop
+  return reconcile.Result{}, nil
+}
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
+The following are a few possible return options to restart the Reconcile:
+```go
+// With the error:
+return ctrl.Result{}, err
 
-```sh
-make uninstall
+// Without an error:
+return ctrl.Result{Requeue: true}, nil
+
+// Therefore, to stop the Reconcile, use:
+return ctrl.Result{}, nil
+
+//Reconcile again after X time:
+return ctrl.Result{RequeueAfter: nextRun.Sub(r.Now())}, nil
 ```
-
-**UnDeploy the controller from the cluster:**
-
-```sh
-make undeploy
-```
-
-## Project Distribution
-
-Following the options to release and provide this solution to the users.
-
-### By providing a bundle with all YAML files
-
-1. Build the installer for the image built and published in the registry:
-
-```sh
-make build-installer IMG=<some-registry>/memcached:tag
-```
-
-**NOTE:** The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without its
-dependencies.
-
-2. Using the installer
-
-Users can just run 'kubectl apply -f <URL for YAML BUNDLE>' to install
-the project, i.e.:
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/<org>/memcached/<tag or branch>/dist/install.yaml
-```
-
-### By providing a Helm Chart
-
-1. Build the chart using the optional helm plugin
-
-```sh
-kubebuilder edit --plugins=helm/v1-alpha
-```
-
-2. See that a chart was generated under 'dist/chart', and users
-can obtain this solution from there.
-
-**NOTE:** If you change the project, you need to update the Helm Chart
-using the same command above to sync the latest changes. Furthermore,
-if you create webhooks, you need to use the above command with
-the '--force' flag and manually ensure that any custom configuration
-previously added to 'dist/chart/values.yaml' or 'dist/chart/manager/manager.yaml'
-is manually re-applied afterwards.
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2025.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
