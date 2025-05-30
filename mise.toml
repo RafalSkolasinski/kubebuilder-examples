@@ -1,4 +1,4 @@
 [tools]
-kubebuilder = "4.5.2"
+kubebuilder = "4.6.0"
 kubectl = "1.33.1"
 minikube = "1.36.0"
