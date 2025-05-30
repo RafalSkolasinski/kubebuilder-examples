@@ -42,7 +42,7 @@ make install
 # Run your controller in the terminal
 make run
 
-# Deplyoy sample application
+# Deploy sample application
 kubectl apply -k config/samples/
 
 # Building images and deploying
@@ -106,6 +106,24 @@ To generate all required files:
 - Then, run `make manifests` to generate the CRD manifests under `config/crd/bases` and a sample under `config/crd/samples`.
 
 Both commands use [controller-gen](https://book.kubebuilder.io/reference/controller-gen) with different flags for code and manifest generation, respectively.
+
+
+### Running in cluster
+
+```bash
+# Install CRDs into the cluster
+make install
+
+# Run your controller in the terminal
+make run
+
+# Deploy sample application
+kubectl apply -k config/samples/
+
+# Building images and deploying
+make docker-build docker-push IMG=rafalskolasinski/kubebuilder-memcached-operator:latest
+make deploy IMG=rafalskolasinski/kubebuilder-memcached-operator:latest
+```
 
 ### Reconciliation Process
 
