@@ -3,6 +3,8 @@
 set -o errexit
 set -o pipefail
 
+# Set repository root directory
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 function print {
     color_start=$'\e[1;33m'
@@ -42,9 +44,9 @@ function generate_quick_start {
     print "Using kubebuilder: $(kubebuilder_version)"
 
     print "removing project ..."
-    rm -rf 0-quick-start
-    mkdir 0-quick-start
-    cd 0-quick-start
+    rm -rf "${REPO_ROOT}/0-quick-start"
+    mkdir "${REPO_ROOT}/0-quick-start"
+    cd "${REPO_ROOT}/0-quick-start"
 
     print "Running kubebuilder init ..."
     kubebuilder init --domain example.com --repo example.com/guestbook --project-name guestbook
@@ -74,9 +76,9 @@ function generate_getting_started {
     print "Using kubebuilder: $(kubebuilder_version)"
 
     print "removing project ..."
-    rm -rf 1-getting-started
-    mkdir 1-getting-started
-    cd 1-getting-started
+    rm -rf "${REPO_ROOT}/1-getting-started"
+    mkdir "${REPO_ROOT}/1-getting-started"
+    cd "${REPO_ROOT}/1-getting-started"
 
     print "Running kubebuilder init ..."
     kubebuilder init --domain example.com --repo example.com/memcached --project-name memcached
