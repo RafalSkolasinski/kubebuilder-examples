@@ -1,5 +1,5 @@
 /*
-Copyright 2025.
+Copyright 2024 The Kubernetes authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@ package controller
 import (
 	"context"
 	"fmt"
-
-	"time"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/ptr"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	cachev1alpha1 "example.com/memcached/api/v1alpha1"
 )
@@ -42,6 +39,8 @@ import (
 const (
 	// typeAvailableMemcached represents the status of the Deployment reconciliation
 	typeAvailableMemcached = "Available"
+	// typeDegradedMemcached represents the status used when the custom resource is deleted and the finalizer operations are yet to occur.
+	typeDegradedMemcached = "Degraded"
 )
 
 // MemcachedReconciler reconciles a Memcached object
@@ -59,15 +58,19 @@ type MemcachedReconciler struct {
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the Memcached object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
+// It is essential for the controller's reconciliation loop to be idempotent. By following the Operator
+// pattern you will create Controllers which provide a reconcile function
+// responsible for synchronizing resources until the desired state is reached on the cluster.
+// Breaking this recommendation goes against the design principles of controller-runtime.
+// and may lead to unforeseen consequences such as resources becoming stuck and requiring manual intervention.
+// For further info:
+// - About Operator Pattern: https://kubernetes.io/docs/concepts/extend-kubernetes/operator/
+// - About Controllers: https://kubernetes.io/docs/concepts/architecture/controller/
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.19.1/pkg/reconcile
 func (r *MemcachedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := logf.FromContext(ctx)
+	log := log.FromContext(ctx)
 
 	// Fetch the Memcached instance
 	// The purpose is check if the Custom Resource for the Kind Memcached
@@ -87,7 +90,7 @@ func (r *MemcachedReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	// Let's just set the status as Unknown when no status is available
-	if len(memcached.Status.Conditions) == 0 {
+	if memcached.Status.Conditions == nil || len(memcached.Status.Conditions) == 0 {
 		meta.SetStatusCondition(&memcached.Status.Conditions, metav1.Condition{Type: typeAvailableMemcached, Status: metav1.ConditionUnknown, Reason: "Reconciling", Message: "Starting reconciliation"})
 		if err = r.Status().Update(ctx, memcached); err != nil {
 			log.Error(err, "Failed to update Memcached status")
@@ -228,7 +231,7 @@ func (r *MemcachedReconciler) deploymentForMemcached(
 				},
 				Spec: corev1.PodSpec{
 					SecurityContext: &corev1.PodSecurityContext{
-						RunAsNonRoot: ptr.To(true),
+						RunAsNonRoot: &[]bool{true}[0],
 						SeccompProfile: &corev1.SeccompProfile{
 							Type: corev1.SeccompProfileTypeRuntimeDefault,
 						},
@@ -240,9 +243,9 @@ func (r *MemcachedReconciler) deploymentForMemcached(
 						// Ensure restrictive context for the container
 						// More info: https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
 						SecurityContext: &corev1.SecurityContext{
-							RunAsNonRoot:             ptr.To(true),
-							RunAsUser:                ptr.To(int64(1001)),
-							AllowPrivilegeEscalation: ptr.To(false),
+							RunAsNonRoot:             &[]bool{true}[0],
+							RunAsUser:                &[]int64{1001}[0],
+							AllowPrivilegeEscalation: &[]bool{false}[0],
 							Capabilities: &corev1.Capabilities{
 								Drop: []corev1.Capability{
 									"ALL",

@@ -1,5 +1,5 @@
 /*
-Copyright 2025.
+Copyright 2024 The Kubernetes authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// +kubebuilder:docs-gen:collapse=Apache License
 
 package v1alpha1
 
@@ -22,6 +23,8 @@ import (
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
+// +kubebuilder:docs-gen:collapse=Imports
 
 // MemcachedSpec defines the desired state of Memcached.
 type MemcachedSpec struct {
@@ -39,9 +42,6 @@ type MemcachedSpec struct {
 
 // MemcachedStatus defines the observed state of Memcached.
 type MemcachedStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Represents the observations of a Memcached's current state.
 	// Memcached.status.conditions.type are: "Available", "Progressing", and "Degraded"
 	// Memcached.status.conditions.status are one of True, False, Unknown.
