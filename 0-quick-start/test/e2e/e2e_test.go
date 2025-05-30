@@ -27,7 +27,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"my.domain/guestbook/test/utils"
+	"example.com/guestbook/test/utils"
 )
 
 // namespace where the project is deployed in

@@ -35,7 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
-	cachev1alpha1 "my.domain/memcached/api/v1alpha1"
+	cachev1alpha1 "example.com/memcached/api/v1alpha1"
 )
 
 // Definitions to manage status conditions
@@ -50,9 +50,9 @@ type MemcachedReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=cache.my.domain,resources=memcacheds,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=cache.my.domain,resources=memcacheds/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=cache.my.domain,resources=memcacheds/finalizers,verbs=update
+// +kubebuilder:rbac:groups=cache.example.com,resources=memcacheds,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=cache.example.com,resources=memcacheds/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=cache.example.com,resources=memcacheds/finalizers,verbs=update
 // +kubebuilder:rbac:groups=core,resources=events,verbs=create;patch
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch

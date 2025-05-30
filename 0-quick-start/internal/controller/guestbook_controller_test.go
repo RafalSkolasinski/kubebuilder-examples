@@ -27,7 +27,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	webappv1 "my.domain/guestbook/api/v1"
+	webappv1 "example.com/guestbook/api/v1"
 )
 
 var _ = Describe("Guestbook Controller", func() {

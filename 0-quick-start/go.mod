@@ -1,4 +1,4 @@
-module my.domain/guestbook
+module example.com/guestbook
 
 go 1.23.0
 

@@ -2,19 +2,19 @@
 # This file is used to track the info used to scaffold your project
 # and allow the plugins properly work.
 # More info: https://book.kubebuilder.io/reference/project-config.html
-domain: my.domain
+domain: example.com
 layout:
 - go.kubebuilder.io/v4
 projectName: guestbook
-repo: my.domain/guestbook
+repo: example.com/guestbook
 resources:
 - api:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: my.domain
+  domain: example.com
   group: webapp
   kind: Guestbook
-  path: my.domain/guestbook/api/v1
+  path: example.com/guestbook/api/v1
   version: v1
 version: "3"

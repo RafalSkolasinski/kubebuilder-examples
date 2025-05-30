@@ -32,7 +32,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - cache.my.domain
+  - cache.example.com
   resources:
   - memcacheds
   verbs:
@@ -44,13 +44,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - cache.my.domain
+  - cache.example.com
   resources:
   - memcacheds/finalizers
   verbs:
   - update
 - apiGroups:
-  - cache.my.domain
+  - cache.example.com
   resources:
   - memcacheds/status
   verbs:

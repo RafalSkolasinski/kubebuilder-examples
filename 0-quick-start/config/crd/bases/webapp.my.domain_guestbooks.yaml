@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
-  name: guestbooks.webapp.my.domain
+  name: guestbooks.webapp.example.com
 spec:
-  group: webapp.my.domain
+  group: webapp.example.com
   names:
     kind: Guestbook
     listKind: GuestbookList

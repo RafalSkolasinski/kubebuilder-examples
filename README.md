@@ -19,7 +19,7 @@ This is my playground with [Kubebuilder](https://github.com/kubernetes-sigs/kube
 
 ```bash
 # Bootstrap Project
-kubebuilder init --domain my.domain --repo my.domain/guestbook --project-name guestbook
+kubebuilder init --domain example.com --repo example.com/guestbook --project-name guestbook
 
 # Create API
 kubebuilder create api --group webapp --version v1 --kind Guestbook
@@ -90,7 +90,7 @@ Notice that resources are always lowercase, and by convention are the lowercase 
 
 ```bash
 # Bootstrap Project
-kubebuilder init --domain my.domain --repo my.domain/memcached --project-name memcached
+kubebuilder init --domain example.com --repo example.com/memcached --project-name memcached
 
 # Create API
 kubebuilder create api --group cache --version v1alpha1 --kind Memcached
@@ -103,7 +103,7 @@ After creating AP need to generate manifests with the specs and validations.
 To generate all required files:
 
 - Run `make generate` to create the `DeepCopy` implementations in `api/v1alpha1/zz_generated.deepcopy.go`.
-- Then, run `make manifests` to generate the CRD manifests under `config/crd/bases` and a sample for it under `config/crd/samples`.
+- Then, run `make manifests` to generate the CRD manifests under `config/crd/bases` and a sample under `config/crd/samples`.
 
 Both commands use [controller-gen](https://book.kubebuilder.io/reference/controller-gen) with different flags for code and manifest generation, respectively.
 

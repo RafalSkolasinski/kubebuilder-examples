@@ -8,7 +8,7 @@ metadata:
   name: memcached-editor-role
 rules:
 - apiGroups:
-  - cache.my.domain
+  - cache.example.com
   resources:
   - memcacheds
   verbs:
@@ -20,7 +20,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - cache.my.domain
+  - cache.example.com
   resources:
   - memcacheds/status
   verbs:

@@ -33,7 +33,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	cachev1alpha1 "my.domain/memcached/api/v1alpha1"
+	cachev1alpha1 "example.com/memcached/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 

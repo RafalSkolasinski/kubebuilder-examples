@@ -1,4 +1,4 @@
-module my.domain/memcached
+module example.com/memcached
 
 go 1.22.0
 
