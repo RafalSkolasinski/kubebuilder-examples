@@ -26,6 +26,9 @@ function modify_getting_started {
     print "Getting memcached_types.go"
     wget "$(repo_raw_url)/getting-started/testdata/project/internal/controller/memcached_controller.go"
     mv memcached_controller.go internal/controller/memcached_controller.go
+
+    print "Copying sample CR"
+    cp ../templates/cache_v1alpha1_memcached.yaml config/samples/cache_v1alpha1_memcached.yaml
 }
 
 function generate_getting_started {
