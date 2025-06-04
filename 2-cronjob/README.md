@@ -1,4 +1,4 @@
-# Tutorial - Cronjob Example
+# Example - Cronjob Example
 
 Reference: https://book.kubebuilder.io/cronjob-tutorial/cronjob-tutorial
 

@@ -13,7 +13,8 @@ This is my playground with [Kubebuilder](https://github.com/kubernetes-sigs/kube
 
 - [Quick Start: GuestBook](./0-quick-start/) - bare-bone controller that illustrated initial scaffolding
 - [Getting Started: Memcached](./1-getting-started/) - simple controller that creates Memcached deployments
-- [Tutorial: CronJob Operator](./2-cronjob/) - advanced example
+- [Example: CronJob Operator](./2-cronjob/) - advanced example
+- [Example: Deploy Plugin](./3-deploy-plugin/) - example on using deploy plugin
 
 
 ## Playground environment.
