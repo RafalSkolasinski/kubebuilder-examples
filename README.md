@@ -11,5 +11,17 @@ This is my playground with [Kubebuilder](https://github.com/kubernetes-sigs/kube
 
 ## Examples
 
-- [Quick Start](./0-quick-start/) - bare-bone controller that illustrated initial scaffolding
-- [Getting Started](./1-getting-started/) - simple controller that creates Memcached deployments
+- [Quick Start: GuestBook](./0-quick-start/) - bare-bone controller that illustrated initial scaffolding
+- [Getting Started: Memcached](./1-getting-started/) - simple controller that creates Memcached deployments
+- [Tutorial: CronJob Operator](./2-cronjob/) - advanced example
+
+
+## Playground environment.
+
+- required tools are defined via https://mise.jdx.dev/
+- testing cluster: standard Minikube should do
+
+
+## License
+
+Kubebuilder examples are governed by their own license. Anything on top, see [LICENSE](./LICENSE).

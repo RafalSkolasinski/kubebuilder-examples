@@ -23,7 +23,7 @@ function modify_getting_started {
     wget "$(repo_raw_url)/getting-started/testdata/project/api/v1alpha1/memcached_types.go"
     mv memcached_types.go api/v1alpha1/memcached_types.go
 
-    print "Getting memcached_types.go"
+    print "Getting memcached_controller.go"
     wget "$(repo_raw_url)/getting-started/testdata/project/internal/controller/memcached_controller.go"
     mv memcached_controller.go internal/controller/memcached_controller.go
 
