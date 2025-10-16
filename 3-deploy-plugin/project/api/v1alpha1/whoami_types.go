@@ -27,31 +27,38 @@ import (
 type WhoamiSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
-	// Size defines the number of Whoami instances
 	// The following markers will use OpenAPI v3 schema to validate the value
 	// More info: https://book.kubebuilder.io/reference/markers/crd-validation.html
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=3
-	// +kubebuilder:validation:ExclusiveMaximum=false
-	Size int32 `json:"size,omitempty"`
 
-	// Port defines the port that will be used to init the container with the image
-	ContainerPort int32 `json:"containerPort,omitempty"`
+	// size defines the number of Whoami instances
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=0
+	// +optional
+	Size *int32 `json:"size,omitempty"`
+
+	// containerPort defines the port that will be used to init the container with the image
+	// +required
+	ContainerPort int32 `json:"containerPort"`
 }
 
 // WhoamiStatus defines the observed state of Whoami
 type WhoamiStatus struct {
-	// Represents the observations of a Whoami's current state.
-	// Whoami.status.conditions.type are: "Available", "Progressing", and "Degraded"
-	// Whoami.status.conditions.status are one of True, False, Unknown.
-	// Whoami.status.conditions.reason the value should be a CamelCase string and producers of specific
-	// condition types may define expected values and meanings for this field, and whether the values
-	// are considered a guaranteed API.
-	// Whoami.status.conditions.Message is a human readable message indicating details about the transition.
-	// For further information see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+	// For Kubernetes API conventions, see:
+	// https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
 
-	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+	// conditions represent the current state of the Whoami resource.
+	// Each condition has a unique type and reflects the status of a specific aspect of the resource.
+	//
+	// Standard condition types include:
+	// - "Available": the resource is fully functional
+	// - "Progressing": the resource is being created or updated
+	// - "Degraded": the resource failed to reach or maintain its desired state
+	//
+	// The status of each condition is one of True, False, or Unknown.
+	// +listType=map
+	// +listMapKey=type
+	// +optional
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -59,11 +66,19 @@ type WhoamiStatus struct {
 
 // Whoami is the Schema for the whoamis API
 type Whoami struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta `json:",inline"`
 
-	Spec   WhoamiSpec   `json:"spec,omitempty"`
-	Status WhoamiStatus `json:"status,omitempty"`
+	// metadata is a standard object metadata
+	// +optional
+	metav1.ObjectMeta `json:"metadata,omitempty,omitzero"`
+
+	// spec defines the desired state of Whoami
+	// +required
+	Spec WhoamiSpec `json:"spec"`
+
+	// status defines the observed state of Whoami
+	// +optional
+	Status WhoamiStatus `json:"status,omitempty,omitzero"`
 }
 
 // +kubebuilder:object:root=true

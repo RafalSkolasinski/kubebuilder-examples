@@ -78,7 +78,7 @@ type WhoamiReconciler struct {
 // For further info:
 // - About Operator Pattern: https://kubernetes.io/docs/concepts/extend-kubernetes/operator/
 // - About Controllers: https://kubernetes.io/docs/concepts/architecture/controller/
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
+// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.22.1/pkg/reconcile
 func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := logf.FromContext(ctx)
 
@@ -99,7 +99,6 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, err
 	}
 
-	// Let's just set the status as Unknown when no status is available
 	if len(whoami.Status.Conditions) == 0 {
 		meta.SetStatusCondition(&whoami.Status.Conditions, metav1.Condition{Type: typeAvailableWhoami, Status: metav1.ConditionUnknown, Reason: "Reconciling", Message: "Starting reconciliation"})
 		if err = r.Status().Update(ctx, whoami); err != nil {
@@ -123,12 +122,7 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/finalizers
 	if !controllerutil.ContainsFinalizer(whoami, whoamiFinalizer) {
 		log.Info("Adding Finalizer for Whoami")
-		if ok := controllerutil.AddFinalizer(whoami, whoamiFinalizer); !ok {
-			err = fmt.Errorf("finalizer for Whoami was not added")
-			log.Error(err, "Failed to add finalizer for Whoami")
-			return ctrl.Result{}, err
-		}
-
+		controllerutil.AddFinalizer(whoami, whoamiFinalizer)
 		if err = r.Update(ctx, whoami); err != nil {
 			log.Error(err, "Failed to update custom resource to add finalizer")
 			return ctrl.Result{}, err
@@ -233,13 +227,18 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, err
 	}
 
+	// If the size is not defined in the Custom Resource then we will set the desired replicas to 0
+	var desiredReplicas int32 = 0
+	if whoami.Spec.Size != nil {
+		desiredReplicas = *whoami.Spec.Size
+	}
+
 	// The CRD API defines that the Whoami type have a WhoamiSpec.Size field
 	// to set the quantity of Deployment instances to the desired state on the cluster.
 	// Therefore, the following code will ensure the Deployment size is the same as defined
 	// via the Size spec of the Custom Resource which we are reconciling.
-	size := whoami.Spec.Size
-	if *found.Spec.Replicas != size {
-		found.Spec.Replicas = &size
+	if found.Spec.Replicas == nil || *found.Spec.Replicas != desiredReplicas {
+		found.Spec.Replicas = ptr.To(desiredReplicas)
 		if err = r.Update(ctx, found); err != nil {
 			log.Error(err, "Failed to update Deployment",
 				"Deployment.Namespace", found.Namespace, "Deployment.Name", found.Name)
@@ -275,7 +274,7 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	// The following implementation will update the status
 	meta.SetStatusCondition(&whoami.Status.Conditions, metav1.Condition{Type: typeAvailableWhoami,
 		Status: metav1.ConditionTrue, Reason: "Reconciling",
-		Message: fmt.Sprintf("Deployment for custom resource (%s) with %d replicas created successfully", whoami.Name, size)})
+		Message: fmt.Sprintf("Deployment for custom resource (%s) with %d replicas created successfully", whoami.Name, desiredReplicas)})
 
 	if err := r.Status().Update(ctx, whoami); err != nil {
 		log.Error(err, "Failed to update Whoami status")
@@ -309,7 +308,6 @@ func (r *WhoamiReconciler) doFinalizerOperationsForWhoami(cr *kubebuilderv1alpha
 func (r *WhoamiReconciler) deploymentForWhoami(
 	whoami *kubebuilderv1alpha1.Whoami) (*appsv1.Deployment, error) {
 	ls := labelsForWhoami()
-	replicas := whoami.Spec.Size
 
 	// Get the Operand image
 	image, err := imageForWhoami()
@@ -323,7 +321,7 @@ func (r *WhoamiReconciler) deploymentForWhoami(
 			Namespace: whoami.Namespace,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: &replicas,
+			Replicas: whoami.Spec.Size,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: ls,
 			},

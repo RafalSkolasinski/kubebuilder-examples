@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: whoamis.kubebuilder.example.com
 spec:
   group: kubebuilder.example.com
@@ -37,27 +37,36 @@ spec:
           metadata:
             type: object
           spec:
-            description: WhoamiSpec defines the desired state of Whoami
+            description: spec defines the desired state of Whoami
             properties:
               containerPort:
-                description: Port defines the port that will be used to init the container
-                  with the image
+                description: containerPort defines the port that will be used to init
+                  the container with the image
                 format: int32
                 type: integer
               size:
-                description: |-
-                  Size defines the number of Whoami instances
-                  The following markers will use OpenAPI v3 schema to validate the value
-                  More info: https://book.kubebuilder.io/reference/markers/crd-validation.html
+                default: 1
+                description: size defines the number of Whoami instances
                 format: int32
-                maximum: 3
-                minimum: 1
+                minimum: 0
                 type: integer
+            required:
+            - containerPort
             type: object
           status:
-            description: WhoamiStatus defines the observed state of Whoami
+            description: status defines the observed state of Whoami
             properties:
               conditions:
+                description: |-
+                  conditions represent the current state of the Whoami resource.
+                  Each condition has a unique type and reflects the status of a specific aspect of the resource.
+
+                  Standard condition types include:
+                  - "Available": the resource is fully functional
+                  - "Progressing": the resource is being created or updated
+                  - "Degraded": the resource failed to reach or maintain its desired state
+
+                  The status of each condition is one of True, False, or Unknown.
                 items:
                   description: Condition contains details for one aspect of the current
                     state of this API Resource.
@@ -113,7 +122,12 @@ spec:
                   - type
                   type: object
                 type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true
