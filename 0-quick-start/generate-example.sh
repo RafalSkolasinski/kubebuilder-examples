@@ -31,6 +31,12 @@ function modify_quick_start {
 
     goimports "$temp_file" > "$controller_file"
     rm -f "$temp_file"
+
+    print "Adding foo: bar below the TODO comment ..."
+    awk '/Add fields here/{print "  foo: bar";next}1' \
+        config/samples/webapp_v1_guestbook.yaml > "$temp_file"
+
+    mv "$temp_file" config/samples/webapp_v1_guestbook.yaml
 }
 
 function generate_quick_start {
