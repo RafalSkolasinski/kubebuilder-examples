@@ -13,6 +13,24 @@ function kubebuilder_version {
     mise ls -c kubebuilder --json | jq .[0].version -r
 }
 
+function append_make_targets {
+    print "Appending minikube-load, kind-load and restart targets to Makefile ..."
+    cat >> Makefile <<'EOF'
+
+.PHONY: minikube-load
+minikube-load:
+	minikube image load ${IMG}
+
+.PHONY: kind-load
+kind-load:
+	kind load docker-image ${IMG}
+
+.PHONY: restart
+restart:
+	$(KUBECTL) rollout restart -n whoami-system deployment/whoami-controller-manager
+EOF
+}
+
 function generate_example {
     print "Regenerating getting-started example"
     print "Using kubebuilder: $(kubebuilder_version)"
@@ -34,6 +52,8 @@ function generate_example {
         --run-as-user="1001" \
         --image-container-port="80" \
         --plugins="deploy-image/v1-alpha"
+
+    append_make_targets
 }
 
 generate_example
