@@ -35,6 +35,24 @@ function modify_getting_started {
     sed -i '' 's/crd webhook/crd:maxDescLen=0 webhook/g' Makefile
 }
 
+function append_make_targets {
+    print "Appending minikube-load, kind-load and restart targets to Makefile ..."
+    cat >> Makefile <<'EOF'
+
+.PHONY: minikube-load
+minikube-load:
+	minikube image load ${IMG}
+
+.PHONY: kind-load
+kind-load:
+	kind load docker-image ${IMG}
+
+.PHONY: restart
+restart:
+	$(KUBECTL) rollout restart -n project-system deployment/project-controller-manager
+EOF
+}
+
 function generate_getting_started {
     print "Regenerating getting-started example"
     print "Using kubebuilder: $(kubebuilder_version)"
@@ -52,6 +70,8 @@ function generate_getting_started {
 
     print "Modifying the example ..."
     modify_getting_started
+
+    append_make_targets
 
     print "Generating deepcopy & manifests ..."
     go mod tidy && make generate manifests

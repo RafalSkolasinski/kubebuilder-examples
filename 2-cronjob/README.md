@@ -25,9 +25,12 @@ make run
 # Deploy sample application
 kubectl apply -k config/samples/
 
-# Building images and deploying
+# Building images and deploying (using remote docker registry)
 make docker-build docker-push IMG=rafalskolasinski/cronjob-operator:latest
 make deploy IMG=rafalskolasinski/cronjob-operator:latest
+
+# Or using minikube
+make docker-build minikube-load deploy restart IMG=controller:dev
 ```
 
 ## Other notes
