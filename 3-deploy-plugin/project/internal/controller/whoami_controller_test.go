@@ -29,7 +29,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	kubebuilderv1alpha1 "example.com/whoami/api/v1alpha1"
@@ -78,7 +77,7 @@ var _ = Describe("Whoami controller", func() {
 						Namespace: namespace.Name,
 					},
 					Spec: kubebuilderv1alpha1.WhoamiSpec{
-						Size:          ptr.To(int32(1)),
+						Size:          new(int32(1)),
 						ContainerPort: 80,
 					},
 				}
