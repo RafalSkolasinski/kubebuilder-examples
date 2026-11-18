@@ -91,7 +91,7 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		if apierrors.IsNotFound(err) {
 			// If the custom resource is not found then it usually means that it was deleted or not created
 			// In this way, we will stop the reconciliation
-			log.Info("whoami resource not found. Ignoring since object must be deleted")
+			log.Info("Whoami resource not found, ignoring since object must be deleted")
 			return ctrl.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
@@ -121,7 +121,7 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	// occur before the custom resource is deleted.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/finalizers
 	if !controllerutil.ContainsFinalizer(whoami, whoamiFinalizer) {
-		log.Info("Adding Finalizer for Whoami")
+		log.Info("Adding finalizer for Whoami")
 		controllerutil.AddFinalizer(whoami, whoamiFinalizer)
 		if err = r.Update(ctx, whoami); err != nil {
 			log.Error(err, "Failed to update custom resource to add finalizer")
@@ -134,7 +134,7 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	isWhoamiMarkedToBeDeleted := whoami.GetDeletionTimestamp() != nil
 	if isWhoamiMarkedToBeDeleted {
 		if controllerutil.ContainsFinalizer(whoami, whoamiFinalizer) {
-			log.Info("Performing Finalizer Operations for Whoami before delete CR")
+			log.Info("Performing finalizer operations for Whoami before deleting CR")
 
 			// Let's add here a status "Downgrade" to reflect that this resource began its process to be terminated.
 			meta.SetStatusCondition(&whoami.Status.Conditions, metav1.Condition{Type: typeDegradedWhoami,
@@ -172,7 +172,7 @@ func (r *WhoamiReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 				return ctrl.Result{}, err
 			}
 
-			log.Info("Removing Finalizer for Whoami after successfully perform the operations")
+			log.Info("Removing finalizer for Whoami after successfully performing the operations")
 			if ok := controllerutil.RemoveFinalizer(whoami, whoamiFinalizer); !ok {
 				err = fmt.Errorf("finalizer for Whoami was not removed")
 				log.Error(err, "Failed to remove finalizer for Whoami")
