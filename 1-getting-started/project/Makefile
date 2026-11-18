@@ -238,3 +238,15 @@ mv $(1) $(1)-$(3) ;\
 } ;\
 ln -sf $$(realpath $(1)-$(3)) $(1)
 endef
+
+.PHONY: minikube-load
+minikube-load:
+	minikube image load ${IMG}
+
+.PHONY: kind-load
+kind-load:
+	kind load docker-image ${IMG}
+
+.PHONY: restart
+restart:
+	$(KUBECTL) rollout restart -n memcached-system deployment/memcached-controller-manager
