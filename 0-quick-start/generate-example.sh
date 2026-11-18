@@ -39,6 +39,24 @@ function modify_quick_start {
     mv "$temp_file" config/samples/webapp_v1_guestbook.yaml
 }
 
+function append_make_targets {
+    print "Appending minikube-load, kind-load and restart targets to Makefile ..."
+    cat >> Makefile <<'EOF'
+
+.PHONY: minikube-load
+minikube-load:
+	minikube image load ${IMG}
+
+.PHONY: kind-load
+kind-load:
+	kind load docker-image ${IMG}
+
+.PHONY: restart
+restart:
+	$(KUBECTL) rollout restart -n guestbook-system deployment/guestbook-controller-manager
+EOF
+}
+
 function generate_quick_start {
     print "Regenerating quick-start example"
     print "Using kubebuilder: $(kubebuilder_version)"
@@ -56,6 +74,8 @@ function generate_quick_start {
 
     print "Modifying the example ..."
     modify_quick_start
+
+    append_make_targets
 
     print "Generating manifests ..."
     make manifests
