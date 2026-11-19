@@ -27,6 +27,14 @@ function modify_getting_started {
     wget "$(repo_raw_url)/getting-started/testdata/project/internal/controller/memcached_controller.go"
     mv memcached_controller.go internal/controller/memcached_controller.go
 
+    if wget -q --spider "$(repo_raw_url)/getting-started/testdata/project/internal/controller/conditions.go"; then
+        print "Getting conditions.go"
+        wget "$(repo_raw_url)/getting-started/testdata/project/internal/controller/conditions.go"
+        mv conditions.go internal/controller/conditions.go
+    else
+        print "No conditions.go at this kubebuilder version, skipping"
+    fi
+
     print "Copying sample CR"
     cp ../templates/cache_v1alpha1_memcached.yaml config/samples/cache_v1alpha1_memcached.yaml
 }

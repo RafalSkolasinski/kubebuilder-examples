@@ -32,13 +32,16 @@ import (
 
 var _ = Describe("Memcached Controller", func() {
 	Context("When reconciling a resource", func() {
-		const resourceName = "test-resource"
+		const (
+			resourceName      = "test-resource"
+			resourceNamespace = "default"
+		)
 
 		ctx := context.Background()
 
 		typeNamespacedName := types.NamespacedName{
 			Name:      resourceName,
-			Namespace: "default", // TODO(user):Modify as needed
+			Namespace: resourceNamespace,
 		}
 		memcached := &cachev1alpha1.Memcached{}
 
@@ -49,7 +52,7 @@ var _ = Describe("Memcached Controller", func() {
 				resource := &cachev1alpha1.Memcached{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      resourceName,
-						Namespace: "default",
+						Namespace: resourceNamespace,
 					},
 					// TODO(user): Specify other spec details if needed.
 				}
