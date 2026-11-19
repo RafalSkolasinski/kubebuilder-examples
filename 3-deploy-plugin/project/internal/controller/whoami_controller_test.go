@@ -145,7 +145,7 @@ var _ = Describe("Whoami controller", func() {
 				HaveField("Type", Equal(typeAvailableWhoami)), &conditions))
 			Expect(conditions).To(HaveLen(1), "Multiple conditions of type %s", typeAvailableWhoami)
 			Expect(conditions[0].Status).To(Equal(metav1.ConditionTrue), "condition %s", typeAvailableWhoami)
-			Expect(conditions[0].Reason).To(Equal("Reconciling"), "condition %s", typeAvailableWhoami)
+			Expect(conditions[0].Reason).To(Equal(reasonReconciling), "condition %s", typeAvailableWhoami)
 		})
 	})
 })
