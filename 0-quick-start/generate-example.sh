@@ -31,6 +31,30 @@ function modify_quick_start {
 
     goimports "$temp_file" > "$controller_file"
     rm -f "$temp_file"
+
+    print "Adding foo: bar below the TODO comment ..."
+    awk '/Add fields here/{print "  foo: bar";next}1' \
+        config/samples/webapp_v1_guestbook.yaml > "$temp_file"
+
+    mv "$temp_file" config/samples/webapp_v1_guestbook.yaml
+}
+
+function append_make_targets {
+    print "Appending minikube-load, kind-load and restart targets to Makefile ..."
+    cat >> Makefile <<'EOF'
+
+.PHONY: minikube-load
+minikube-load:
+	minikube image load ${IMG}
+
+.PHONY: kind-load
+kind-load:
+	kind load docker-image ${IMG}
+
+.PHONY: restart
+restart:
+	$(KUBECTL) rollout restart -n guestbook-system deployment/guestbook-controller-manager
+EOF
 }
 
 function generate_quick_start {
@@ -50,6 +74,8 @@ function generate_quick_start {
 
     print "Modifying the example ..."
     modify_quick_start
+
+    append_make_targets
 
     print "Generating manifests ..."
     make manifests

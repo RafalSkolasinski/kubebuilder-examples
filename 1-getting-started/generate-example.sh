@@ -31,6 +31,24 @@ function modify_getting_started {
     cp ../templates/cache_v1alpha1_memcached.yaml config/samples/cache_v1alpha1_memcached.yaml
 }
 
+function append_make_targets {
+    print "Appending minikube-load, kind-load and restart targets to Makefile ..."
+    cat >> Makefile <<'EOF'
+
+.PHONY: minikube-load
+minikube-load:
+	minikube image load ${IMG}
+
+.PHONY: kind-load
+kind-load:
+	kind load docker-image ${IMG}
+
+.PHONY: restart
+restart:
+	$(KUBECTL) rollout restart -n memcached-system deployment/memcached-controller-manager
+EOF
+}
+
 function generate_getting_started {
     print "Regenerating getting-started example"
     print "Using kubebuilder: $(kubebuilder_version)"
@@ -48,6 +66,8 @@ function generate_getting_started {
 
     print "Modifying the example ..."
     modify_getting_started
+
+    append_make_targets
 
     print "Generating deepcopy & manifests ..."
     make generate manifests
