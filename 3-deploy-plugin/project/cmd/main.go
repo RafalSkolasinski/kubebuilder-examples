@@ -183,7 +183,7 @@ func main() {
 		Scheme: mgr.GetScheme(),
 		Recorder: mgr.GetEventRecorder("whoami-controller"),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "Failed to create controller", "controller", "Whoami")
+		setupLog.Error(err, "Failed to create controller", "controller", "whoami")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
