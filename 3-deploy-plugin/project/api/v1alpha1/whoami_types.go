@@ -70,7 +70,7 @@ type Whoami struct {
 
 	// metadata is a standard object metadata
 	// +optional
-	metav1.ObjectMeta `json:"metadata,omitempty,omitzero"`
+	metav1.ObjectMeta `json:"metadata,omitzero"`
 
 	// spec defines the desired state of Whoami
 	// +required
@@ -78,7 +78,7 @@ type Whoami struct {
 
 	// status defines the observed state of Whoami
 	// +optional
-	Status WhoamiStatus `json:"status,omitempty,omitzero"`
+	Status WhoamiStatus `json:"status,omitzero"`
 }
 
 // +kubebuilder:object:root=true
@@ -86,7 +86,7 @@ type Whoami struct {
 // WhoamiList contains a list of Whoami
 type WhoamiList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
+	metav1.ListMeta `json:"metadata,omitzero"`
 	Items           []Whoami `json:"items"`
 }
 
