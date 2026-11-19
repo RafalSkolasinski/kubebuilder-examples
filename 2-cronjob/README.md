@@ -13,7 +13,13 @@ kubebuilder create api --group batch --version v1 --kind CronJob --resource --co
 make manifests generate
 ```
 
-## Running in cluster
+## Implementation
+
+- `api/v1/cronjob_types.go` — API: `Spec.Schedule`, `Status.Active`
+- `internal/controller/cronjob_controller.go` — reconcile: run and clean up Jobs (helpers at bottom)
+- type changes: `make generate manifests`
+
+## Running locally
 
 ```bash
 # Install CRDs into the cluster
@@ -24,13 +30,27 @@ make run
 
 # Deploy sample application
 kubectl apply -k config/samples/
+```
 
+## Running in cluster
+
+```bash
 # Building images and deploying (using remote docker registry)
 make docker-build docker-push IMG=rafalskolasinski/cronjob-operator:latest
 make deploy IMG=rafalskolasinski/cronjob-operator:latest
 
 # Or using minikube
 make docker-build minikube-load deploy restart IMG=controller:dev
+
+# Deploy sample application
+kubectl apply -k config/samples/
+```
+
+## Cleanup
+
+```bash
+make undeploy    # removes controller, RBAC and CRDs (everything deploy installed)
+make uninstall   # removes only the CRDs
 ```
 
 ## Other notes

@@ -30,7 +30,7 @@ Both commands use [controller-gen](https://book.kubebuilder.io/reference/control
 
 API and controller implementation is taken directly from upstream example, see [generate-example.sh](./generate-example.sh) script for details.
 
-### Running in cluster
+### Running locally
 
 ```bash
 # Install CRDs into the cluster
@@ -41,14 +41,34 @@ make run
 
 # Deploy sample application
 kubectl apply -k config/samples/
+```
 
+### Running in cluster
+
+```bash
 # Building images and deploying (using remote docker registry)
 make docker-build docker-push IMG=rafalskolasinski/kubebuilder-memcached-operator:latest
 make deploy IMG=rafalskolasinski/kubebuilder-memcached-operator:latest
 
 # Or using minikube
 make docker-build minikube-load deploy restart IMG=controller:dev
+
+# Deploy sample application
+kubectl apply -k config/samples/
 ```
+
+### Cleanup
+
+```bash
+make undeploy    # removes controller, RBAC and CRDs (everything deploy installed)
+make uninstall   # removes only the CRDs
+```
+
+## Implementation
+
+- `api/v1alpha1/memcached_types.go` — API: `Spec.Size`, status conditions
+- `internal/controller/memcached_controller.go` — reconcile: scale the Memcached Deployment, report conditions
+- type changes: `make generate manifests`
 
 ## Project Structure
 
