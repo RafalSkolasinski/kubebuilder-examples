@@ -44,6 +44,12 @@ make run
 kubectl apply -k config/samples/
 ```
 
+## Tests
+
+`make test` runs envtest-based integration tests against a local API server.
+
+If the `setup-envtest` tool install fails try to add `GOPROXY=direct` flag.
+
 ## Running in cluster
 
 ```bash
